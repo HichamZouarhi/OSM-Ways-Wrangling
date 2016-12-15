@@ -1,0 +1,7 @@
+Open Street Map Aarhus Wiki page : http://wiki.openstreetmap.org/wiki/Aarhus
+OSM OSAK page : http://wiki.openstreetmap.org/wiki/OSAK
+Metro Extracts Mapzen Aarhus : https://mapzen.com/data/metro-extracts/metro/aarhus_denmark/
+MongoDB official Documentation : https://docs.mongodb.com/
+Stackoverflow forum : http://stackoverflow.com/
+Aarhus Wikipedia's page : https://en.wikipedia.org/wiki/Aarhus
+PyMongo Documentation : http://api.mongodb.com/python/2.8/tutorial.html#bulk-inserts
