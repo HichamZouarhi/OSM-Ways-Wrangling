@@ -113,4 +113,8 @@ db.aarhus_ways.aggregate([{$lookup:{from: "aarhus_nodes",localField: "node_refs"
 
 * Note that I ignored some of the data since here I'm only interested in the [id,name,highway] of the ways and the position from the nodes
 
-db.aarhus_ways.aggregate([{"$unwind":"$node_refs"},{$lookup:{from: "aarhus_nodes",localField: "node_refs",foreignField: "id",as: "nodes"}},{"$project":{"id":1,"name":1,"highway":1,"nodes.pos":1}}]).pretty() 
+There is another way to do it using a combination of $unwind , $lookup and $group stages of a pipeline:
+
+first I unwind the ways collection on the node_refs table then I do a lookup to join it with the nodes collection and then group by the id of the way to get all nodes belonging to each way.
+
+db.aarhus_ways.aggregate([{"$unwind":"$node_refs"},{$lookup:{from: "aarhus_nodes",localField: "node_refs",foreignField: "id",as: "nodes"}},{"$project":{"id":1,"name":1,"highway":1,"nodes.pos":1}},{"$group":{"_id":"$id"}}]).pretty()
