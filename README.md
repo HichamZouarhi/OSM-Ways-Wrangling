@@ -73,6 +73,7 @@ after generating the 2 json files, the script JSONtoMONGO.py inserts their conte
 in this part I will present some statistics about the data, first the size of the files generated in the first part of the wrangling process:
 
 aarhus_nodes.json → 119.9 MB
+
 aarhus_ways.json → 18.4 MB
 
 * Number of documents:
@@ -80,6 +81,7 @@ aarhus_ways.json → 18.4 MB
 the Database named DAND3 contains 2 collections aarhus_nodes and aarhus_ways, here are the sizes of each:
 
 `db.aarhus_ways.find().count()` → 55432
+
 `db.aarhus_nodes.find().count()` → 441696
 
 * Number of unique users :
@@ -87,9 +89,11 @@ the Database named DAND3 contains 2 collections aarhus_nodes and aarhus_ways, he
 for both Collections how many users there are :
 
 `db.aarhus_nodes.distinct(“created.user”)` → 335
+
 `db.aarhus_ways.distinct(“created.user”)` → 285
 
 * Top contributing user:
+
 `db.aarhus_nodes.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$sort":{"count":-1}}, {"$limit":1}]) → { "_id" : "AWSbot", "count" : 82996 }`
 
 I looked for it in the OSM wikis, this user is a bot used by the council of the city aarhus in Denmark to load data from different servers to OSM, it stands for Adresse Web Services
@@ -99,6 +103,7 @@ however for the ways another user takes the lead :
 `db.aarhus_ways.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$sort":{"count":-1}}, {"$limit":1}]) → { "_id" : "Flare", "count" : 11580 }`
 
 * Number of users appearing only once:
+
 `db.aarhus_nodes.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$group":{"_id":"$count", "num_users":{"$sum":1}}}, {"$sort":{"_id":1}}, {"$limit":1}]) → 73`
 
 In this project I am more interested in nodes since they are the elements that have a geographic information
