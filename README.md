@@ -79,37 +79,37 @@ aarhus_ways.json → 18.4 MB
  
 the Database named DAND3 contains 2 collections aarhus_nodes and aarhus_ways, here are the sizes of each:
 
-db.aarhus_ways.find().count() → 55432
-db.aarhus_nodes.find().count() → 441696
+`db.aarhus_ways.find().count()` → 55432
+`db.aarhus_nodes.find().count()` → 441696
 
 * Number of unique users :
 
 for both Collections how many users there are :
 
-db.aarhus_nodes.distinct(“created.user”) → 335
-db.aarhus_ways.distinct(“created.user”) → 285
+`db.aarhus_nodes.distinct(“created.user”)` → 335
+`db.aarhus_ways.distinct(“created.user”)` → 285
 
 * Top contributing user:
-db.aarhus_nodes.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$sort":{"count":-1}}, {"$limit":1}]) → { "_id" : "AWSbot", "count" : 82996 }
+`db.aarhus_nodes.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$sort":{"count":-1}}, {"$limit":1}]) → { "_id" : "AWSbot", "count" : 82996 }`
 
 I looked for it in the OSM wikis, this user is a bot used by the council of the city aarhus in Denmark to load data from different servers to OSM, it stands for Adresse Web Services
 
 however for the ways another user takes the lead :
 
-db.aarhus_ways.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$sort":{"count":-1}}, {"$limit":1}]) → { "_id" : "Flare", "count" : 11580 }
+`db.aarhus_ways.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$sort":{"count":-1}}, {"$limit":1}]) → { "_id" : "Flare", "count" : 11580 }`
 
 * Number of users appearing only once:
-db.aarhus_nodes.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$group":{"_id":"$count", "num_users":{"$sum":1}}}, {"$sort":{"_id":1}}, {"$limit":1}]) → 73
+`db.aarhus_nodes.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$group":{"_id":"$count", "num_users":{"$sum":1}}}, {"$sort":{"_id":1}}, {"$limit":1}]) → 73`
 
 In this project I am more interested in nodes since they are the elements that have a geographic information
 
-5 – Additional Ideas :
+**5 – Additional Ideas :**
 
 since the ways are represented as a group of nodes, and they have no geographic information, and as a GIS engineer I would like to consider extraction the position from the nodes and generate a geometry attribute for the ways.
 
 This pipeline does the work for now, it uses $lookup to join the 2 collections on the nodes id and outputs the result in a  new collection called nodes:
 
-db.aarhus_ways.aggregate([{$lookup:{from: "aarhus_nodes",localField: "node_refs",foreignField: "id",as: "nodes"}},{"$project":{"id":1,"name":1,"highway":1,"nodes.pos":1}},{"$out":"nodes"}])
+`db.aarhus_ways.aggregate([{$lookup:{from: "aarhus_nodes",localField: "node_refs",foreignField: "id",as: "nodes"}},{"$project":{"id":1,"name":1,"highway":1,"nodes.pos":1}},{"$out":"nodes"}])`
 
 * Note that I ignored some of the data since here I'm only interested in the [id,name,highway] of the ways and the position from the nodes
 
@@ -117,4 +117,4 @@ There is another way to do it using a combination of $unwind , $lookup and $grou
 
 first I unwind the ways collection on the node_refs table then I do a lookup to join it with the nodes collection and then group by the id of the way to get all nodes belonging to each way.
 
-db.aarhus_ways.aggregate([{"$unwind":"$node_refs"},{$lookup:{from: "aarhus_nodes",localField: "node_refs",foreignField: "id",as: "nodes"}},{"$project":{"id":1,"name":1,"highway":1,"nodes.pos":1}},{"$group":{"_id":"$id"}}]).pretty()
+`db.aarhus_ways.aggregate([{"$unwind":"$node_refs"},{$lookup:{from: "aarhus_nodes",localField: "node_refs",foreignField: "id",as: "nodes"}},{"$project":{"id":1,"name":1,"highway":1,"nodes.pos":1}},{"$group":{"_id":"$id"}}]).pretty()`
